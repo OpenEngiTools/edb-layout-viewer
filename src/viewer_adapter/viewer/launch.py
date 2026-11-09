@@ -1,0 +1,170 @@
+# Copyright (C) 2023 - 2026 Contributors.
+# SPDX-License-Identifier: Apache-2.0
+
+"""Qt viewer launch orchestration."""
+
+from __future__ import annotations
+
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
+
+from viewer_adapter.viewer._dependencies import _INSTALL_HINT, require_layout_viewer
+
+if TYPE_CHECKING:
+    from layout_viewer.qt.window import LayoutWindow
+    from layout_viewer.scene import LayoutScene
+
+
+def launch_viewer(
+    edb: Any = None,
+    *,
+    scene: LayoutScene | None = None,
+    layers: str | list[str] | None = None,
+    nets: str | list[str] | None = None,
+    arc_segments: int | None = None,
+    block: bool | None = None,
+    color_by_net: bool = True,
+    plot_components: bool = True,
+    annotate_component_names: bool = True,
+    plot_components_on_both_side: bool = True,
+    plot_outlines: bool = True,
+    analytic_traces: bool = False,
+    exact_component_bounds: bool = False,
+    chord_error: float = 0.002,
+    progressive: bool = True,
+    live: bool = False,
+    refresh_interval: int = 50,
+    debug: bool = False,
+    backend: str | None = None,
+) -> LayoutWindow:
+    """Open an interactive Qt RHI layout window.
+
+    Parameters
+    ----------
+    edb : pyedb.grpc.edb.Edb, optional
+        Existing gRPC session. Its lifetime remains controlled by the caller.
+        Capture runs in one background worker with progress in the viewer canvas.
+    scene : LayoutScene, optional
+        Detached scene to display instead of reading an EDB session.
+    layers, nets : str or list[str], optional
+        Names to include when capturing an EDB layout.
+    arc_segments : int, optional
+        Select fixed subdivisions per EDB arc. By default use adaptive chords.
+        Providing this parameter overrides ``chord_error``.
+    chord_error : float, optional
+        Maximum chord sagitta in millimeters. Default is 0.002 mm. Segment
+        counts adapt to radius and total sweep, with at most 10 degrees per chord.
+    progressive : bool, optional
+        Display the current layer first, then remaining copper, pads and
+        components. Default is True. One progress indicator remains until complete.
+    live : bool, optional
+        Automatically refresh after supported PyEDB gRPC geometry edits. Default
+        is False. An EDB-backed window also supports explicit ``refresh()``.
+    refresh_interval : int, optional
+        Minimum interval in milliseconds for coalescing automatic updates.
+        Default is 50. The Qt event loop must be running.
+    analytic_traces : bool, optional
+        Preserve analytic traces for precision at deep zoom. Default is False:
+        read source path contours to reduce remote geometry-property requests.
+    exact_component_bounds : bool, optional
+        Read exact component envelopes from EDB. Default is False: reuse pad
+        bounds and estimate copper-free footprints from pin positions.
+    block : bool, optional
+        Run the Qt event loop. By default, run it only when this call creates
+        QApplication. With an existing application, return the window directly.
+    color_by_net : bool, optional
+        Use PyEDB's existing network palette instead of layer colors. Default is True.
+    plot_components : bool, optional
+        Show component envelopes derived from captured pads, with source bounds
+        as a fallback. Default is True.
+    annotate_component_names : bool, optional
+        Show readable, nonoverlapping reference names. Default is True.
+    plot_components_on_both_side : bool, optional
+        Show components on all visible placement layers. Default is True.
+        Set False to restrict them to the current view side.
+    plot_outlines : bool, optional
+        Draw an opaque net-colored outline, one screen pixel wide, around every
+        shape. Default is True. It can also be toggled from the View menu.
+    debug : bool, optional
+        When True, exceptions caught during capture are logged with a full
+        traceback and re-raised immediately instead of being recorded as a
+        diagnostic note and skipped. Default is False.
+
+    backend : str, optional
+        Rendering API: "auto", "vulkan", "d3d11", or "metal". Defaults to
+        PYEDB_VIEWER_BACKEND or "auto": Direct3D 11 on Windows, Vulkan on
+        Linux, Metal on macOS. OpenGL is not supported.
+
+    Returns
+    -------
+    layout_viewer.qt.window.LayoutWindow
+        Viewer window. Keep a reference when displaying the window without
+        blocking. Use its signals and methods to interact with the view.
+    """
+    if (edb is None) == (scene is None):
+        raise ValueError("Provide exactly one of edb or scene.")
+    if live and edb is None:
+        raise ValueError("live=True requires an EDB session.")
+    if isinstance(refresh_interval, bool) or not isinstance(refresh_interval, int) or refresh_interval < 0:
+        raise ValueError("refresh_interval must be a nonnegative integer in milliseconds.")
+    require_layout_viewer()
+    try:
+        from layout_viewer.qt.app import show_scene
+    except ImportError as exc:
+        raise ImportError(_INSTALL_HINT) from exc
+    options: dict[str, Any] = {}
+    if scene is None:
+        from pathlib import Path
+
+        from layout_viewer.capture import SourceCapture
+        from pyedb.grpc.database.layout_changes import layout_changes
+
+        def load(
+            progress: Callable[[str, int, int], None] | None, preview: Callable[..., Any] | None = None
+        ) -> LayoutScene:
+            from viewer_adapter.scene.builder import scene_from_edb
+
+            return scene_from_edb(
+                edb,
+                layers=layers,
+                nets=nets,
+                arc_segments=arc_segments,
+                progress=progress,
+                analytic_traces=analytic_traces,
+                exact_component_bounds=exact_component_bounds,
+                chord_error=chord_error,
+                preview=preview,
+                debug=debug,
+            )
+
+        def load_delta(delta, previous, progress):
+            from viewer_adapter.scene.patching import scene_patch_from_edb
+
+            return scene_patch_from_edb(
+                edb,
+                delta,
+                previous,
+                progress=progress,
+                nets=nets,
+                arc_segments=arc_segments,
+                analytic_traces=analytic_traces,
+                chord_error=chord_error,
+            )
+
+        options["title"] = Path(str(getattr(edb, "edbpath", None) or "EDB layout")).stem
+        options["loader"] = SourceCapture(
+            load, progressive=progressive, changes=layout_changes(edb), delta_loader=load_delta
+        )
+        options["live"] = live
+        options["refresh_interval"] = refresh_interval
+    return show_scene(
+        scene,
+        block=block,
+        backend=backend,
+        color_by_net=color_by_net,
+        plot_components=plot_components,
+        annotate_component_names=annotate_component_names,
+        plot_components_on_both_side=plot_components_on_both_side,
+        plot_outlines=plot_outlines,
+        **options,
+    )
