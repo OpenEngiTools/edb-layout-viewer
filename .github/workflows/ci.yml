@@ -21,6 +21,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install Linux graphics build dependency
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes libegl1
       - name: Install layout-viewer-core
         run: python -m pip install "layout-viewer-core @ git+https://github.com/OpenEngiTools/layout-viewer-core.git"
       - name: Install package and development tools
