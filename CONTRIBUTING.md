@@ -2,8 +2,8 @@
 
 ## Supported environments
 
-The package requires Python 3.13 or newer. CI exercises Python 3.13 on Linux;
-other Python versions and operating systems are not currently in the automated
+The package requires Python 3.13 or newer. CI exercises Python 3.13 on Linux
+and Windows; other Python versions and macOS are not currently in the automated
 matrix. Runtime compatibility is bounded to PyEDB 0.87.x,
 `layout-viewer-core` 0.1.x, and `ansys-edb-core` 0.3.x. The CI job installs
 `layout-viewer-core` from its companion GitHub repository, installs the
