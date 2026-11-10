@@ -18,6 +18,7 @@ def test_parser_accepts_repeated_and_multi_value_options():
     assert args.nets == ["VCC"]
     assert args.backend == "vulkan"
     assert args.debug is False
+    assert args.live is True
 
 
 def test_main_opens_design_and_blocks_in_viewer(tmp_path, monkeypatch):
@@ -43,6 +44,27 @@ def test_main_opens_design_and_blocks_in_viewer(tmp_path, monkeypatch):
     assert launched["layers"] == ["TOP"]
     assert launched["nets"] is None
     assert launched["block"] is True
+    assert launched["live"] is True
+
+
+def test_main_passes_live_flag_values(tmp_path, monkeypatch):
+    design = tmp_path / "board.aedb"
+    design.mkdir()
+    launched = {}
+    monkeypatch.setattr(cli, "_open_edb", lambda path, edbversion: "EDB")
+    monkeypatch.setattr(cli, "launch_viewer", lambda edb, **kwargs: launched.update(kwargs))
+
+    assert cli.main([str(design), "--live", "False"]) == 0
+    assert launched["live"] is False
+    assert cli.main([str(design), "--live"]) == 0
+    assert launched["live"] is True
+    assert cli.main([str(design), "--live", "0"]) == 0
+    assert launched["live"] is False
+
+
+def test_parser_rejects_invalid_live_value():
+    with pytest.raises(SystemExit):
+        cli.build_parser().parse_args(["design.aedb", "--live", "maybe"])
 
 
 def test_main_rejects_missing_design(tmp_path, capsys):
