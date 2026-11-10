@@ -37,7 +37,17 @@ edb-layout-viewer my_design.aedb --edbversion 2025.1 --layers TOP BOTTOM --nets 
 python -m edb_layout_viewer my_design.aedb
 ```
 
-Run `edb-layout-viewer --help` for all options (`--backend`, `--debug`, `--live [true|false]`, default true).
+Omit the design path to open a file dialog and select the design's `edb.def` file:
+
+```bash
+edb-layout-viewer
+python -m edb_layout_viewer
+```
+
+The viewer opens the selected file's containing directory. Cancelling the dialog
+exits without opening an EDB session.
+
+Run `edb-layout-viewer --help` for all options (`--backend`, `--debug`, `--live [true|false]`, default false).
 
 ## Implementation
 
