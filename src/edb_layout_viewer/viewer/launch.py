@@ -9,8 +9,8 @@ from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from layout_viewer.qt.window import LayoutWindow
-    from layout_viewer.scene import LayoutScene
+    from layout_viewer_core.qt.window import LayoutWindow
+    from layout_viewer_core.scene import LayoutScene
 
 
 def launch_viewer(
@@ -95,7 +95,7 @@ def launch_viewer(
 
     Returns
     -------
-    layout_viewer.qt.window.LayoutWindow
+    layout_viewer_core.qt.window.LayoutWindow
         Viewer window. Keep a reference when displaying the window without
         blocking. Use its signals and methods to interact with the view.
     """
@@ -105,19 +105,19 @@ def launch_viewer(
         raise ValueError("live=True requires an EDB session.")
     if isinstance(refresh_interval, bool) or not isinstance(refresh_interval, int) or refresh_interval < 0:
         raise ValueError("refresh_interval must be a nonnegative integer in milliseconds.")
-    from layout_viewer.qt.app import show_scene
+    from layout_viewer_core.qt.app import show_scene
 
     options: dict[str, Any] = {}
     if scene is None:
         from pathlib import Path
 
-        from layout_viewer.capture import SourceCapture
+        from layout_viewer_core.capture import SourceCapture
         from pyedb.grpc.database.layout_changes import layout_changes
 
         def load(
             progress: Callable[[str, int, int], None] | None, preview: Callable[..., Any] | None = None
         ) -> LayoutScene:
-            from viewer_adapter.scene.builder import scene_from_edb
+            from edb_layout_viewer.scene.builder import scene_from_edb
 
             return scene_from_edb(
                 edb,
@@ -133,7 +133,7 @@ def launch_viewer(
             )
 
         def load_delta(delta, previous, progress):
-            from viewer_adapter.scene.patching import scene_patch_from_edb
+            from edb_layout_viewer.scene.patching import scene_patch_from_edb
 
             return scene_patch_from_edb(
                 edb,

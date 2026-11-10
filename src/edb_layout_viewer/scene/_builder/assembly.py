@@ -6,18 +6,18 @@ import math
 from collections.abc import Callable, Iterable
 from typing import TYPE_CHECKING
 
-from layout_viewer.scene import LayoutScene, SceneJoin, SceneLayer, ScenePad, ScenePolygon, SceneTrace
+from layout_viewer_core.scene import LayoutScene, SceneJoin, SceneLayer, ScenePad, ScenePolygon, SceneTrace
 
-from viewer_adapter.diagnostics import _Diagnostics
-from viewer_adapter.scene._builder.components import _components
-from viewer_adapter.scene._builder.layers import _layer_names_by_id
-from viewer_adapter.scene._builder.padstacks import _padstacks
-from viewer_adapter.scene._builder.primitives import _primitives, _scene_filters
+from edb_layout_viewer.diagnostics import _Diagnostics
+from edb_layout_viewer.scene._builder.components import _components
+from edb_layout_viewer.scene._builder.layers import _layer_names_by_id
+from edb_layout_viewer.scene._builder.padstacks import _padstacks
+from edb_layout_viewer.scene._builder.primitives import _primitives, _scene_filters
 
 if TYPE_CHECKING:
     from pyedb.grpc.edb import Edb
 
-    from viewer_adapter.scene._builder.common import Progress
+    from edb_layout_viewer.scene._builder.common import Progress
 
 
 def scene_from_edb(

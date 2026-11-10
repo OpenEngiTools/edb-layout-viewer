@@ -6,12 +6,12 @@ import math
 from itertools import pairwise
 from typing import TYPE_CHECKING
 
-from layout_viewer.scene import SceneJoin, SceneTrace
+from layout_viewer_core.scene import SceneJoin, SceneTrace
 
 if TYPE_CHECKING:
     from ansys.edb.core.geometry.point_data import PointData
     from ansys.edb.core.primitive.primitive import Primitive
-    from layout_viewer.scene import Point, Ring
+    from layout_viewer_core.scene import Point, Ring
 
 
 def arc_segment_count(
@@ -36,7 +36,7 @@ def arc_segment_count(
 
 
 def _contour(primitive: Primitive, arc_segments: int, chord_error: float | None = None) -> Ring:
-    from viewer_adapter.conversion.geometry import contour_from_points
+    from edb_layout_viewer.conversion.geometry import contour_from_points
 
     return contour_from_points(primitive.polygon_data.points, arc_segments, chord_error)
 

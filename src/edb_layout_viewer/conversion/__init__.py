@@ -3,7 +3,7 @@
 
 """Geometry conversion helpers for EDB primitives."""
 
-from viewer_adapter.conversion.geometry import (
+from edb_layout_viewer.conversion.geometry import (
     centerline_length,
     contour_from_points,
     trace_dimensions,

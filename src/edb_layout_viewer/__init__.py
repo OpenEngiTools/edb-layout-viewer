@@ -7,17 +7,17 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from viewer_adapter.viewer.launch import launch_viewer
+from edb_layout_viewer.viewer.launch import launch_viewer
 
 if TYPE_CHECKING:
-    from viewer_adapter.scene.builder import scene_from_edb
+    from edb_layout_viewer.scene.builder import scene_from_edb
 
 __all__ = ["launch_viewer", "scene_from_edb"]
 
 
 def __getattr__(name: str) -> Any:
     if name == "scene_from_edb":
-        from viewer_adapter.scene.builder import scene_from_edb
+        from edb_layout_viewer.scene.builder import scene_from_edb
 
         return scene_from_edb
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

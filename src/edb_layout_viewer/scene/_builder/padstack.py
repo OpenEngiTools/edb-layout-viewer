@@ -9,9 +9,9 @@ from typing import TYPE_CHECKING, Any
 from ansys.edb.core.definition.padstack_def_data import PadGeometryType as CorePadGeometryType
 from ansys.edb.core.definition.padstack_def_data import PadType as CorePadType
 from ansys.edb.core.geometry.polygon_data import PolygonData as CorePolygonData
-from layout_viewer.scene import ScenePad, ScenePolygon
+from layout_viewer_core.scene import ScenePad, ScenePolygon
 
-from viewer_adapter.scene._builder.geometry import (
+from edb_layout_viewer.scene._builder.geometry import (
     arc_segment_count,
     _nsided_polygon_points,
     _rotate,
@@ -24,9 +24,9 @@ if TYPE_CHECKING:
     from ansys.edb.core.definition.padstack_def_data import PadstackDefData
     from ansys.edb.core.hierarchy.component_group import ComponentGroup
     from ansys.edb.core.primitive.padstack_instance import PadstackInstance
-    from layout_viewer.scene import Point
+    from layout_viewer_core.scene import Point
 
-    from viewer_adapter.scene._builder.common import PinOwner, Placement
+    from edb_layout_viewer.scene._builder.common import PinOwner, Placement
 
     PadTemplate = tuple[str, tuple[Any, ...], Point, float]
     HoleProfile = tuple[str, float, float, float, float]
@@ -61,7 +61,7 @@ def _placement(
             if transform.is_null:
                 component_cache[key] = basis, (0.0, 0.0)
             else:
-                from viewer_adapter.conversion.geometry import transform_basis_points
+                from edb_layout_viewer.conversion.geometry import transform_basis_points
 
                 points = transform_basis_points(transform)
                 if points is None:

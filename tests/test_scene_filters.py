@@ -1,6 +1,6 @@
 import pytest
 
-from viewer_adapter.scene.filters import normalize_names
+from edb_layout_viewer.scene.filters import normalize_names
 
 
 @pytest.mark.parametrize(

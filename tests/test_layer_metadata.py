@@ -2,8 +2,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from viewer_adapter.diagnostics import _Diagnostics
-from viewer_adapter.layer_metadata import _component_sides, _conductor_names
+from edb_layout_viewer.diagnostics import _Diagnostics
+from edb_layout_viewer.layer_metadata import _component_sides, _conductor_names
 
 
 def _edb(layers, signal_layers=()):
