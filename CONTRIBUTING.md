@@ -7,7 +7,8 @@ Python 3.13 and 3.14 on Linux and Windows; macOS is not currently part of the
 tested support matrix. Runtime compatibility is bounded to PyEDB 0.87.x,
 `layout-viewer-core` 0.1.x, and `ansys-edb-core` 0.3.x. The CI job installs
 `layout-viewer-core` from its companion GitHub repository, installs the
-current compatible dependency set, and tests the bundled EDB fixture.
+current compatible dependency set, and tests the bundled EDB fixture when an
+AEDT runtime is installed. That integration test is skipped otherwise.
 Rendering and interactive GUI behavior still require a usable Qt/RHI runtime
 and should be smoke-tested on the target machine.
 

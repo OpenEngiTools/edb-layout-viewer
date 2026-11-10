@@ -10,10 +10,11 @@ readme = "README.md"
 requires-python = ">=3.13,<4"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
-authors = [{name = "OpenEngiTools"}]
+authors = [{ name = "OpenEngiTools" }]
 dependencies = [
     "pyedb>=0.87.0,<0.88",
-    "layout-viewer-core>=0.1.0,<0.2",
+    "layout-viewer-core @ git+https://github.com/OpenEngiTools/layout-viewer-core.git",
+    # "layout-viewer-core>=0.1.0,<0.2",
     "ansys-edb-core>=0.3.3,<0.4",
 ]
 
