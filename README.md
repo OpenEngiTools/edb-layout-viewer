@@ -1,4 +1,4 @@
-# edb-viewer-adapter
+# edb-layout-viewer
 
 EDB &rarr; layout-viewer scene adapter.
 
