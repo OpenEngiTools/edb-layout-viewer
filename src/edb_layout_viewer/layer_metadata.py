@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from viewer_adapter.diagnostics import _record_exception
+from edb_layout_viewer.diagnostics import _record_exception
 
 if TYPE_CHECKING:
     from pyedb.grpc.edb import Edb
