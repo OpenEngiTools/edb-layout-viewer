@@ -172,3 +172,98 @@ def _rounded_outline(shape: str, size_x: float, size_y: float, corner: float, ar
         ring += arc(-hx + radius, -hy + radius, math.pi)
     ring += arc(hx - radius, -hy + radius, 3 * math.pi / 2)
     return tuple(ring)
+
+
+def compute_arc_points(
+    p1: list[float], p2: list[float], h: float, n: int = 6, tol: float = 1e-12, *, chord_error: float | None = None
+) -> tuple[list[float], list[float]]:
+    """Get the points of the arc.
+
+    Parameters
+    ----------
+    p1 : list[float]
+        Arc starting point.
+    p2 : list[float]
+        Arc ending point.
+    h : float
+        Arc height (sagitta). Positive values arc upward from p1 to p2,
+        negative values arc downward.
+    n : int, optional
+        Number of points to generate along the arc.
+        The default is ``6``.
+    tol : float, optional
+        Geometric tolerance.
+        The default is ``1e-12``.
+    chord_error : float, optional
+        Maximum chord sagitta in the same units as the coordinates. When set,
+        choose the count from radius and total sweep instead of ``n``.
+
+    Returns
+    -------
+    tuple[list[float], list[float]]
+        Points generated along the arc as (x_coordinates, y_coordinates).
+
+    Notes
+    -----
+    Correctly handles arcs that subtend more than 180° (h > r case).
+
+    Examples
+    --------
+    >>> from edb_layout_viewer.scene._builder.geometry import compute_arc_points
+    >>> p1 = [0.0, 0.0]
+    >>> p2 = [1.0, 0.0]
+    >>> h = 0.2
+    >>> xr, yr = compute_arc_points(p1, p2, h, n=6)
+    >>> len(xr) == len(yr) == 6
+    True
+
+    """
+    if abs(h) < tol:
+        return [], []
+
+    if h > 0:
+        x1, y1, x2, y2 = p1[0], p1[1], p2[0], p2[1]
+        reverse = False
+    else:
+        x1, y1, x2, y2 = p2[0], p2[1], p1[0], p1[1]
+        h = -h
+        reverse = True
+
+    xa = (x2 - x1) / 2
+    ya = (y2 - y1) / 2
+    a = math.sqrt(xa**2 + ya**2)
+    if a < tol:
+        return [], []
+
+    r = (a**2) / (2 * h) + h / 2
+    b = math.sqrt(max(r**2 - a**2, 0.0))
+
+    # h > r means arc > semicircle: center is on the same side as the bulge
+    sign = -1.0 if h > r else 1.0
+    xc = x1 + xa + sign * b * ya / a
+    yc = y1 + ya - sign * b * xa / a
+
+    alpha = math.atan2(y1 - yc, x1 - xc)
+    beta = math.atan2(y2 - yc, x2 - xc)
+
+    dangle = alpha - beta
+    if dangle <= 0:
+        dangle += 2 * math.pi
+    if h > r and dangle < math.pi:
+        dangle = 2 * math.pi - dangle
+
+    if chord_error is not None:
+        n = arc_segment_count(r, dangle, chord_error) - 1
+
+    xr, yr = [], []
+    for i in range(1, n + 1):
+        t = i / (n + 1)
+        angle = alpha - t * dangle
+        xr.append(xc + r * math.cos(angle))
+        yr.append(yc + r * math.sin(angle))
+
+    if reverse:
+        xr.reverse()
+        yr.reverse()
+
+    return xr, yr

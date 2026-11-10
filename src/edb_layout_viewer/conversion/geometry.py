@@ -13,7 +13,8 @@ import grpc
 from ansys.edb.core.geometry.polygon_data import PolygonData as CorePolygonData
 from ansys.edb.core.utility.transform import Transform as CoreTransform
 from pyedb.generic.geometry_operators import GeometryOperators
-from pyedb.misc.utilities import compute_arc_points
+
+from edb_layout_viewer.scene._builder.geometry import compute_arc_points
 
 if TYPE_CHECKING:
     from ansys.edb.core.geometry.point_data import PointData

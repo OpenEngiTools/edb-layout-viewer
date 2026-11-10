@@ -124,12 +124,12 @@ of the caller's EDB session.
 
 ## Development checks
 
-Install the sibling core library and test extra, then run the test suite with:
+From the repository root, run the test suite with `uv` (the sibling
+`layout_viewer_core` package is resolved from the local source configured in
+`pyproject.toml`):
 
 ```bash
-pip install -e ../layout-viewer-core
-pip install -e ".[test]"
-pytest
+uv run --extra test pytest
 ```
 
 Check formatting and lint with Ruff:
