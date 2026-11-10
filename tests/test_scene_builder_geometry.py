@@ -4,10 +4,14 @@ from types import SimpleNamespace
 import pytest
 
 from viewer_adapter.scene._builder.geometry import _thermal_relief_outline
+from viewer_adapter.scene._builder.layers import (
+    _component_is_enabled,
+    _mapped_layers,
+    _padstack_layers,
+    _resolve_component,
+)
 from viewer_adapter.scene._builder.padstack import _pad_template
 from viewer_adapter.scene.builder import (
-    _component_is_enabled,
-    _resolve_component,
     _scene_filters,
     _trace_geometry,
 )
@@ -92,3 +96,26 @@ def test_component_helpers_handle_null_and_enabled_state():
     component = SimpleNamespace(is_null=False, component_property=SimpleNamespace(enabled=False))
     assert _resolve_component(component) is component
     assert not _component_is_enabled(component)
+
+
+def test_padstack_layer_mapping_and_span_resolution():
+    layers = {"top": SimpleNamespace(id=2)}
+    layer_map = SimpleNamespace(
+        is_null=False,
+        msg=SimpleNamespace(SerializeToString=lambda: b"map"),
+        get_mapping_backward=lambda layer_id: [7] if layer_id == 2 else [],
+    )
+    instance = SimpleNamespace(
+        layer_map=layer_map,
+        padstack_def=SimpleNamespace(name="via"),
+        get_layer_range=lambda: (SimpleNamespace(name="top"), SimpleNamespace(name="bottom")),
+    )
+    definition = SimpleNamespace(layer_ids=[7], layer_names=["Top"])
+    edb = SimpleNamespace(stackup=SimpleNamespace(layers=layers))
+
+    assert _mapped_layers(instance, edb, definition, ["top"], {}, layers) == {"top": "Top"}
+    assert _padstack_layers(instance, {"top", "inner", "bottom"}, ("top", "inner", "bottom"), False) == [
+        "top",
+        "inner",
+        "bottom",
+    ]
