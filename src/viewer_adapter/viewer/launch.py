@@ -8,8 +8,6 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
-from viewer_adapter.viewer._dependencies import _INSTALL_HINT, require_layout_viewer
-
 if TYPE_CHECKING:
     from layout_viewer.qt.window import LayoutWindow
     from layout_viewer.scene import LayoutScene
@@ -107,11 +105,8 @@ def launch_viewer(
         raise ValueError("live=True requires an EDB session.")
     if isinstance(refresh_interval, bool) or not isinstance(refresh_interval, int) or refresh_interval < 0:
         raise ValueError("refresh_interval must be a nonnegative integer in milliseconds.")
-    require_layout_viewer()
-    try:
-        from layout_viewer.qt.app import show_scene
-    except ImportError as exc:
-        raise ImportError(_INSTALL_HINT) from exc
+    from layout_viewer.qt.app import show_scene
+
     options: dict[str, Any] = {}
     if scene is None:
         from pathlib import Path
