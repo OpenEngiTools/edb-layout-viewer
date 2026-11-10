@@ -112,7 +112,6 @@ def launch_viewer(
         from pathlib import Path
 
         from layout_viewer_core.capture import SourceCapture
-        from pyedb.grpc.database.layout_changes import layout_changes
 
         def load(
             progress: Callable[[str, int, int], None] | None, preview: Callable[..., Any] | None = None
@@ -147,9 +146,14 @@ def launch_viewer(
             )
 
         options["title"] = Path(str(getattr(edb, "edbpath", None) or "EDB layout")).stem
-        options["loader"] = SourceCapture(
-            load, progressive=progressive, changes=layout_changes(edb), delta_loader=load_delta
-        )
+        changes = None
+        delta_loader = None
+        if live:
+            from pyedb.grpc.database.layout_changes import layout_changes
+
+            changes = layout_changes(edb)
+            delta_loader = load_delta
+        options["loader"] = SourceCapture(load, progressive=progressive, changes=changes, delta_loader=delta_loader)
         options["live"] = live
         options["refresh_interval"] = refresh_interval
     return show_scene(

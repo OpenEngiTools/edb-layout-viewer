@@ -37,7 +37,7 @@ edb-layout-viewer my_design.aedb --edbversion 2025.1 --layers TOP BOTTOM --nets 
 python -m edb_layout_viewer my_design.aedb
 ```
 
-Run `edb-layout-viewer --help` for all options (`--backend`, `--debug`).
+Run `edb-layout-viewer --help` for all options (`--backend`, `--debug`, `--live [true|false]`, default true).
 
 ## Implementation
 
