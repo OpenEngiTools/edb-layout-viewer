@@ -14,8 +14,8 @@ an actionable `ImportError` if `layout-viewer-core` is not installed.
 ## Installation
 
 ```bash
-python -m pip install -e ../layout-viewer-core
-python -m pip install -e ".[test]"
+python -m pip install -e ../layout_viewer_core
+python -m pip install -e ".[dev]"
 ```
 
 ## Usage
@@ -53,6 +53,10 @@ Run `edb-layout-viewer --help` for all options (`--backend`, `--debug`, `--live 
 
 See [IMPLEMENTATION.md](IMPLEMENTATION.md) for the package structure, capture
 and update flows, error behavior, and development checks.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, supported
+environments, checks, and release guidance. Changes are recorded in
+[CHANGELOG.md](CHANGELOG.md).
 
 ## License
 

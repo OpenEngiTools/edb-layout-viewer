@@ -12,12 +12,12 @@ from ansys.edb.core.geometry.polygon_data import PolygonData as CorePolygonData
 from layout_viewer_core.scene import ScenePad, ScenePolygon
 
 from edb_layout_viewer.scene._builder.geometry import (
-    arc_segment_count,
     _nsided_polygon_points,
     _rotate,
     _rounded_outline,
     _thermal_relief_outline,
     _xy,
+    arc_segment_count,
 )
 
 if TYPE_CHECKING:

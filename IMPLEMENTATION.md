@@ -129,14 +129,16 @@ From the repository root, run the test suite with `uv` (the sibling
 `pyproject.toml`):
 
 ```bash
-uv run --extra test pytest
+uv run --extra dev pytest
 ```
 
-Check formatting and lint with Ruff:
+Check lint and formatting with Ruff, then build the wheel and source
+distribution:
 
 ```bash
-ruff check
-ruff format --check
+uv run --extra dev ruff check
+uv run --extra dev ruff format --check
+uv run --extra dev python -m build
 ```
 
 Full EDB capture and Qt rendering checks require the project dependencies and a

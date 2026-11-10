@@ -1,0 +1,60 @@
+# Contributing
+
+## Supported environments
+
+The package supports Python 3.10 through 3.13. CI exercises Python 3.10 and
+3.13 on Linux and Windows; macOS is not currently part of the tested support
+matrix. Runtime compatibility is bounded to PyEDB 0.87.x,
+`layout-viewer-core` 0.1.x, and `ansys-edb-core` 0.3.x. The CI job installs
+the current compatible dependency set and tests the bundled EDB fixture.
+Rendering and interactive GUI behavior still require a usable Qt/RHI runtime
+and should be smoke-tested on the target machine.
+
+## Development setup
+
+This repository expects the sibling `layout_viewer_core` checkout for local
+development:
+
+```text
+OpenEngiTools/
+├── edb-layout-viewer/
+└── layout_viewer_core/
+```
+
+From the repository root, create the environment and install the development
+dependencies:
+
+```bash
+uv sync --extra dev
+```
+
+The `uv` source override uses the sibling checkout in editable mode. For a
+non-`uv` setup, install that checkout and this project:
+
+```bash
+python -m pip install -e ../layout_viewer_core
+python -m pip install -e ".[dev]"
+```
+
+## Checks
+
+Run the same checks as CI:
+
+```bash
+uv run --extra dev pytest
+uv run --extra dev ruff check
+uv run --extra dev ruff format --check
+uv run --extra dev python -m build
+```
+
+Add or update tests when changing public behavior, capture/conversion logic,
+live-update behavior, or supported dependency interfaces. Keep the fixture
+tests independent of proprietary design data.
+
+## Release checklist
+
+1. Update the version in `pyproject.toml` and add a dated entry to
+   `CHANGELOG.md`.
+2. Run the checks above and review the built wheel and source distribution.
+3. Have a maintainer publish the package and create a matching version tag.
+   Do not commit generated distribution files.
