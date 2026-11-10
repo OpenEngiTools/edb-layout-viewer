@@ -2,9 +2,9 @@
 
 ## Supported environments
 
-The package supports Python 3.10 through 3.13. CI exercises Python 3.10 and
-3.13 on Linux and Windows; macOS is not currently part of the tested support
-matrix. Runtime compatibility is bounded to PyEDB 0.87.x,
+The package supports Python 3.13 and newer Python 3 releases. CI exercises
+Python 3.13 and 3.14 on Linux and Windows; macOS is not currently part of the
+tested support matrix. Runtime compatibility is bounded to PyEDB 0.87.x,
 `layout-viewer-core` 0.1.x, and `ansys-edb-core` 0.3.x. The CI job installs
 the current compatible dependency set and tests the bundled EDB fixture.
 Rendering and interactive GUI behavior still require a usable Qt/RHI runtime
