@@ -28,6 +28,17 @@ edb = Edb("my_design.aedb", edbversion="2025.1")
 launch_viewer(edb)
 ```
 
+### Command line
+
+After installation, open a design directly from the shell:
+
+```bash
+edb-layout-viewer my_design.aedb --edbversion 2025.1 --layers TOP BOTTOM --nets VCC GND
+python -m edb_layout_viewer my_design.aedb
+```
+
+Run `edb-layout-viewer --help` for all options (`--backend`, `--debug`).
+
 ## Implementation
 
 See [IMPLEMENTATION.md](IMPLEMENTATION.md) for the package structure, capture
