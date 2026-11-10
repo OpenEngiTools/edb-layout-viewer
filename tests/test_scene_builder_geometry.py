@@ -4,7 +4,7 @@ from types import SimpleNamespace
 import pytest
 
 from edb_layout_viewer.scene._builder.assembly import scene_from_edb as _assembly_scene_from_edb
-from edb_layout_viewer.scene._builder.geometry import arc_segment_count, _thermal_relief_outline, _trace_geometry
+from edb_layout_viewer.scene._builder.geometry import _thermal_relief_outline, _trace_geometry, arc_segment_count
 from edb_layout_viewer.scene._builder.layers import (
     _component_is_enabled,
     _mapped_layers,

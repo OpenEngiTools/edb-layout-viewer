@@ -7,14 +7,14 @@ name = "edb-viewer-adapter"
 version = "0.1.0"
 description = "EDB integration for the layout viewer."
 readme = "README.md"
-requires-python = ">=3.10,<4"
+requires-python = ">=3.10,<3.14"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
 authors = [{name = "OpenEngiTools"}]
 dependencies = [
-    "pyedb",
-    "layout-viewer-core>=0.1.0",
-    "ansys-edb-core>=0.3.3",
+    "pyedb>=0.87.0,<0.88",
+    "layout-viewer-core>=0.1.0,<0.2",
+    "ansys-edb-core>=0.3.3,<0.4",
 ]
 
 [project.scripts]
@@ -22,6 +22,7 @@ edb-layout-viewer = "edb_layout_viewer.cli:main"
 
 [project.optional-dependencies]
 test = ["pytest>=8.0"]
+dev = ["pytest>=8.0", "ruff>=0.11", "build>=1.2"]
 
 [tool.flit.module]
 name = "edb_layout_viewer"
@@ -32,7 +33,8 @@ pythonpath = ["src"]
 
 [tool.ruff]
 line-length = 120
-fix = true
+target-version = "py310"
+fix = false
 
 [tool.ruff.format]
 quote-style = "double"
