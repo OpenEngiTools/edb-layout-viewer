@@ -1,27 +1,28 @@
-# edb-viewer-adapter
+# edb-layout-viewer
 
-EDB &rarr; layout-viewer scene adapter.
+EDB &rarr; layout-viewer-core scene adapter.
 
 This package bridges PyEDB gRPC layout data and the
-Qt/RHI `layout-viewer` frontend. It converts EDB geometry (traces, polygons, padstacks,
-components) into the detached `layout_viewer.scene.LayoutScene` representation, and
+Qt/RHI `layout-viewer-core` frontend. It converts EDB geometry (traces, polygons, padstacks,
+components) into the detached `layout_viewer_core.scene.LayoutScene` representation, and
 subscribes to PyEDB's layout-change event stream (`pyedb.grpc.database.layout_changes`)
 to support live, incremental viewer updates.
 
-Importing `viewer_adapter` does not load Qt; only `launch_viewer()` does, and it raises
-an actionable `ImportError` if `layout-viewer` is not installed.
+Importing `edb_layout_viewer` does not load Qt; only `launch_viewer()` does, and it raises
+an actionable `ImportError` if `layout-viewer-core` is not installed.
 
 ## Installation
 
 ```bash
-pip install edb-viewer-adapter
+python -m pip install -e ../layout-viewer-core
+python -m pip install -e ".[test]"
 ```
 
 ## Usage
 
 ```python
 from pyedb import Edb
-from viewer_adapter import launch_viewer
+from edb_layout_viewer import launch_viewer
 
 edb = Edb("my_design.aedb", edbversion="2025.1")
 launch_viewer(edb)

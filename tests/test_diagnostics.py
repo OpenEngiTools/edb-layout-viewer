@@ -2,7 +2,7 @@ import logging
 
 import pytest
 
-from viewer_adapter.diagnostics import _Diagnostics, _record_exception
+from edb_layout_viewer.diagnostics import _Diagnostics, _record_exception
 
 
 def test_normal_mode_records_message_and_continues():
@@ -19,7 +19,7 @@ def test_debug_mode_records_traceback_logs_and_reraises_once(caplog):
     diagnostics = _Diagnostics(debug=True)
     error = RuntimeError("capture failed")
 
-    with caplog.at_level(logging.ERROR, logger="viewer_adapter.diagnostics"):
+    with caplog.at_level(logging.ERROR, logger="edb_layout_viewer.diagnostics"):
         try:
             raise error
         except RuntimeError as caught:

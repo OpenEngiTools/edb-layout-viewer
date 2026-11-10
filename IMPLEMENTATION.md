@@ -2,15 +2,15 @@
 
 ## Overview
 
-`viewer_adapter` adapts PyEDB gRPC layout data to the detached
-`layout_viewer.scene.LayoutScene` model. It keeps EDB capture separate from
+`edb_layout_viewer` adapts PyEDB gRPC layout data to the detached
+`layout_viewer_core.scene.LayoutScene` model. It keeps EDB capture separate from
 geometry conversion and Qt launch code. The public API remains in the
-`viewer_adapter` package; importing it does not import Qt.
+`edb_layout_viewer` package; importing it does not import Qt.
 
 ## Package structure
 
 ```text
-src/viewer_adapter/
+src/edb_layout_viewer/
 ├── __init__.py
 ├── diagnostics.py
 ├── layer_metadata.py
@@ -18,6 +18,16 @@ src/viewer_adapter/
 │   └── geometry.py
 ├── scene/
 │   ├── builder.py
+│   ├── _builder/
+│   │   ├── __init__.py
+│   │   ├── assembly.py
+│   │   ├── common.py
+│   │   ├── components.py
+│   │   ├── geometry.py
+│   │   ├── layers.py
+│   │   ├── padstack.py
+│   │   ├── padstacks.py
+│   │   └── primitives.py
 │   ├── filters.py
 │   └── patching.py
 └── viewer/
@@ -25,16 +35,26 @@ src/viewer_adapter/
     └── launch.py
 ```
 
-- `__init__.py` exposes `scene_from_edb` and `launch_viewer`; it defers EDB
-  capture imports until capture is requested.
+- `__init__.py` exposes `launch_viewer` and lazily re-exports
+  `scene_from_edb` from `edb_layout_viewer.scene.builder`.
 - `diagnostics.py` handles best-effort capture diagnostics and debug-mode
   logging/re-raising.
 - `layer_metadata.py` identifies conducting layers and maps them to board sides.
 - `conversion/geometry.py` converts EDB points, arcs, paths, and transforms into
   viewer geometry using millimeters.
 - `scene/filters.py` normalizes optional layer and net selections.
-- `scene/builder.py` reads EDB primitives, pads, and components and assembles a
-  complete `LayoutScene`.
+- `scene/builder.py` is the stable capture entry point and delegates to private
+  implementation modules. It also re-exports the primitive and padstack
+  capture helpers used by incremental patching.
+- `scene/_builder/assembly.py` validates capture options, coordinates the
+  extraction passes, and assembles a complete `LayoutScene`.
+- `scene/_builder/geometry.py` and `padstack.py` convert source geometry and
+  place padstack shapes.
+- `scene/_builder/layers.py` resolves layer mappings, component metadata, and
+  cached EDB names.
+- `scene/_builder/primitives.py`, `padstacks.py`, and `components.py` capture
+  the corresponding layout objects.
+- `scene/_builder/common.py` holds shared internal sentinels and type aliases.
 - `scene/patching.py` builds incremental updates from notified layout changes
   without enumerating the full layout.
 - `viewer/_dependencies.py` provides the actionable optional-frontend error.
@@ -47,13 +67,13 @@ The package is an adapter with three main layers:
 ```text
 Public API
   ├── capture request ──> scene builder ──> conversion and metadata helpers
-  └── viewer request ───> viewer launch ──> layout-viewer frontend
+  └── viewer request ───> viewer launch ──> layout-viewer-core frontend
                               │
                               └──> scene builder / incremental patcher
 ```
 
-- **Public API** owns the stable user-facing functions and delegates work; it
-  does not implement geometry conversion or Qt behavior.
+- **Package root** exports `launch_viewer` and lazily re-exports the builder's
+  `scene_from_edb` function for direct capture.
 - **Scene construction** owns EDB reads and produces detached scene data.
   Geometry, stackup metadata, and filter normalization are helpers beneath this
   layer; they do not depend on viewer launch code.
@@ -72,18 +92,18 @@ of the caller's EDB session.
 
 ### Full capture
 
-1. `scene_from_edb` validates capture options and delegates to
-   `scene/builder.py`.
-2. The builder reads stackup metadata once, applies layer/net filters, then
-   extracts primitives, padstacks, and components.
-3. Geometry helpers convert source coordinates to millimeters and preserve
-   analytic traces where requested.
+1. `scene/builder.py` exposes `scene_from_edb`, which delegates to
+   `scene/_builder/assembly.py` for option validation and coordination.
+2. The assembly pass reads stackup metadata once, applies layer/net filters,
+   then calls the primitive, padstack, and component capture modules.
+3. Geometry and layer helpers convert source coordinates to millimeters,
+   resolve mapped layers, and preserve analytic traces where requested.
 4. The builder returns a detached `LayoutScene`; it does not own the EDB
    session's lifetime.
 
 ### Viewer launch and live updates
 
-1. `launch_viewer` validates arguments and checks that `layout-viewer` is
+1. `launch_viewer` validates arguments and checks that `layout-viewer-core` is
    installed.
 2. For EDB-backed views, it configures `SourceCapture` with the full-capture
    loader and, when supported, the layout-change stream and incremental loader.
@@ -104,9 +124,10 @@ of the caller's EDB session.
 
 ## Development checks
 
-Install the test extra and run the dependency-light test suite with:
+Install the sibling core library and test extra, then run the test suite with:
 
 ```bash
+pip install -e ../layout-viewer-core
 pip install -e ".[test]"
 pytest
 ```
