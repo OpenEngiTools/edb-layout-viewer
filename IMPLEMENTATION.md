@@ -124,19 +124,21 @@ of the caller's EDB session.
 
 ## Development checks
 
-Install the sibling core library and test extra, then run the test suite with:
+From the repository root, run the test suite with `uv` (the sibling
+`layout_viewer_core` package is resolved from the local source configured in
+`pyproject.toml`):
 
 ```bash
-pip install -e ../layout-viewer-core
-pip install -e ".[test]"
-pytest
+uv run --extra dev pytest
 ```
 
-Check formatting and lint with Ruff:
+Check lint and formatting with Ruff, then build the wheel and source
+distribution:
 
 ```bash
-ruff check
-ruff format --check
+uv run --extra dev ruff check
+uv run --extra dev ruff format --check
+uv run --extra dev python -m build
 ```
 
 Full EDB capture and Qt rendering checks require the project dependencies and a
