@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
 from layout_viewer.progress import progress_items
@@ -14,7 +13,7 @@ from viewer_adapter.layer_metadata import _component_sides
 if TYPE_CHECKING:
     from pyedb.grpc.edb import Edb
 
-    Progress = Callable[[str, int, int], None]
+    from viewer_adapter.scene._builder.common import Progress
 
 
 def _components(

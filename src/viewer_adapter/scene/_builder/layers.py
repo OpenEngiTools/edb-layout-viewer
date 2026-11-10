@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from ansys.edb.core.primitive.primitive import Primitive
     from pyedb.grpc.edb import Edb
 
-    PinOwner = dict[str, Any]
+    from viewer_adapter.scene._builder.common import PinOwner
 
 _PADSTACK_INSTANCE_STUB = StubAccessor(StubType.padstack_instance)
 _PRIMITIVE_STUB = StubAccessor(StubType.primitive)

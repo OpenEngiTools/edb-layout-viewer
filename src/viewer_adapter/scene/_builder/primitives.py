@@ -20,7 +20,8 @@ if TYPE_CHECKING:
     from ansys.edb.core.primitive.primitive import Primitive
     from pyedb.grpc.edb import Edb
 
-    Progress = Callable[[str, int, int], None]
+    from viewer_adapter.scene._builder.common import Progress
+
     ScenePrimitives = tuple[list[ScenePolygon], list[SceneTrace], list[SceneJoin], list[ScenePad]]
 
 _PRIMITIVE_NAME_PREFIX = {"path": "line", "rectangle": "rect", "polygon": "poly", "bondwire": "bwr"}

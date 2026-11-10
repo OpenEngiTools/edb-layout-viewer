@@ -21,17 +21,15 @@ from viewer_adapter.scene._builder.geometry import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-
     from ansys.edb.core.definition.padstack_def_data import PadstackDefData
     from ansys.edb.core.hierarchy.component_group import ComponentGroup
     from ansys.edb.core.primitive.padstack_instance import PadstackInstance
     from layout_viewer.scene import Point
 
-    Placement = tuple[Callable[[Point], Point], Callable[[Point], Point], float]
+    from viewer_adapter.scene._builder.common import PinOwner, Placement
+
     PadTemplate = tuple[str, tuple[Any, ...], Point, float]
     HoleProfile = tuple[str, float, float, float, float]
-    PinOwner = dict[str, Any]
     ComponentBasis = tuple[tuple[Point, Point], Point]
     PadstackDefinition = tuple[PadstackDefData, dict[str, SimpleNamespace], float, Point]
 

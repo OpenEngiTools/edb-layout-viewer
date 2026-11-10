@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import math
-from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
 from layout_viewer.progress import progress_items
@@ -31,12 +30,9 @@ from viewer_adapter.scene._builder.padstack import (
 if TYPE_CHECKING:
     from ansys.edb.core.hierarchy.component_group import ComponentGroup
     from ansys.edb.core.primitive.padstack_instance import PadstackInstance
-    from layout_viewer.scene import Point
     from pyedb.grpc.edb import Edb
 
-    Progress = Callable[[str, int, int], None]
-    Placement = tuple[Callable[[Point], Point], Callable[[Point], Point], float]
-    PinOwner = dict[str, Any]
+    from viewer_adapter.scene._builder.common import PinOwner, Placement, Progress
 
 
 def _padstack_pin_owner(
