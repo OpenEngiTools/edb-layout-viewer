@@ -11,7 +11,11 @@ requires-python = ">=3.10,<4"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
 authors = [{name = "OpenEngiTools"}]
-dependencies = ["pyedb", "layout-viewer-core>=0.1.0", "ansys-edb-core>=0.3.3"]
+dependencies = [
+    "pyedb",
+    "layout-viewer-core>=0.1.0",
+    "ansys-edb-core>=0.3.3",
+]
 
 [project.optional-dependencies]
 test = ["pytest>=8.0"]
@@ -31,3 +35,6 @@ fix = true
 quote-style = "double"
 indent-style = "space"
 docstring-code-format = true
+
+[tool.uv.sources]
+layout-viewer-core = { path = "../layout_viewer_core", editable = true }
