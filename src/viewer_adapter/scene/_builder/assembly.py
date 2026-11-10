@@ -17,7 +17,7 @@ from viewer_adapter.scene._builder.primitives import _primitives, _scene_filters
 if TYPE_CHECKING:
     from pyedb.grpc.edb import Edb
 
-    Progress = Callable[[str, int, int], None]
+    from viewer_adapter.scene._builder.common import Progress
 
 
 def scene_from_edb(
