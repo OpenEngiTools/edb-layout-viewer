@@ -4,16 +4,16 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from layout_viewer.progress import progress_items
-from layout_viewer.scene import SceneComponent, union_bounds
+from layout_viewer_core.progress import progress_items
+from layout_viewer_core.scene import SceneComponent, union_bounds
 
-from viewer_adapter.diagnostics import _record_exception
-from viewer_adapter.layer_metadata import _component_sides
+from edb_layout_viewer.diagnostics import _record_exception
+from edb_layout_viewer.layer_metadata import _component_sides
 
 if TYPE_CHECKING:
     from pyedb.grpc.edb import Edb
 
-    from viewer_adapter.scene._builder.common import Progress
+    from edb_layout_viewer.scene._builder.common import Progress
 
 
 def _components(

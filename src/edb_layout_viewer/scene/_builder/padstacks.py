@@ -5,13 +5,13 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING, Any
 
-from layout_viewer.progress import progress_items
-from layout_viewer.scene import SceneObjectInfo, ScenePad, ScenePolygon, union_bounds
+from layout_viewer_core.progress import progress_items
+from layout_viewer_core.scene import SceneObjectInfo, ScenePad, ScenePolygon, union_bounds
 
-from viewer_adapter.diagnostics import _record_exception
-from viewer_adapter.layer_metadata import _component_sides, _conductor_names
-from viewer_adapter.scene._builder.common import _UNSET
-from viewer_adapter.scene._builder.layers import (
+from edb_layout_viewer.diagnostics import _record_exception
+from edb_layout_viewer.layer_metadata import _component_sides, _conductor_names
+from edb_layout_viewer.scene._builder.common import _UNSET
+from edb_layout_viewer.scene._builder.layers import (
     _cached_name,
     _layer_names_by_id,
     _mapped_layers,
@@ -20,7 +20,7 @@ from viewer_adapter.scene._builder.layers import (
     _pin_owner,
     _resolve_component,
 )
-from viewer_adapter.scene._builder.padstack import (
+from edb_layout_viewer.scene._builder.padstack import (
     _append_padstack_geometry,
     _cached_pad_template,
     _padstack_definition,
@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     from ansys.edb.core.primitive.padstack_instance import PadstackInstance
     from pyedb.grpc.edb import Edb
 
-    from viewer_adapter.scene._builder.common import PinOwner, Placement, Progress
+    from edb_layout_viewer.scene._builder.common import PinOwner, Placement, Progress
 
 
 def _padstack_pin_owner(

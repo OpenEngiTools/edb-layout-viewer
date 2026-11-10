@@ -2,15 +2,15 @@
 
 ## Overview
 
-`viewer_adapter` adapts PyEDB gRPC layout data to the detached
-`layout_viewer.scene.LayoutScene` model. It keeps EDB capture separate from
+`edb_layout_viewer` adapts PyEDB gRPC layout data to the detached
+`layout_viewer_core.scene.LayoutScene` model. It keeps EDB capture separate from
 geometry conversion and Qt launch code. The public API remains in the
-`viewer_adapter` package; importing it does not import Qt.
+`edb_layout_viewer` package; importing it does not import Qt.
 
 ## Package structure
 
 ```text
-src/viewer_adapter/
+src/edb_layout_viewer/
 ├── __init__.py
 ├── diagnostics.py
 ├── layer_metadata.py
@@ -36,7 +36,7 @@ src/viewer_adapter/
 ```
 
 - `__init__.py` exposes `launch_viewer` and lazily re-exports
-  `scene_from_edb` from `viewer_adapter.scene.builder`.
+  `scene_from_edb` from `edb_layout_viewer.scene.builder`.
 - `diagnostics.py` handles best-effort capture diagnostics and debug-mode
   logging/re-raising.
 - `layer_metadata.py` identifies conducting layers and maps them to board sides.
@@ -67,7 +67,7 @@ The package is an adapter with three main layers:
 ```text
 Public API
   ├── capture request ──> scene builder ──> conversion and metadata helpers
-  └── viewer request ───> viewer launch ──> layout-viewer frontend
+  └── viewer request ───> viewer launch ──> layout-viewer-core frontend
                               │
                               └──> scene builder / incremental patcher
 ```
@@ -103,7 +103,7 @@ of the caller's EDB session.
 
 ### Viewer launch and live updates
 
-1. `launch_viewer` validates arguments and checks that `layout-viewer` is
+1. `launch_viewer` validates arguments and checks that `layout-viewer-core` is
    installed.
 2. For EDB-backed views, it configures `SourceCapture` with the full-capture
    loader and, when supported, the layout-change stream and incremental loader.
@@ -124,9 +124,10 @@ of the caller's EDB session.
 
 ## Development checks
 
-Install the test extra and run the dependency-light test suite with:
+Install the sibling core library and test extra, then run the test suite with:
 
 ```bash
+pip install -e ../layout-viewer-core
 pip install -e ".[test]"
 pytest
 ```

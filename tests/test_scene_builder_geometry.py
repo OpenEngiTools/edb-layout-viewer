@@ -3,19 +3,19 @@ from types import SimpleNamespace
 
 import pytest
 
-from viewer_adapter.scene._builder.assembly import scene_from_edb as _assembly_scene_from_edb
-from viewer_adapter.scene._builder.geometry import arc_segment_count, _thermal_relief_outline, _trace_geometry
-from viewer_adapter.scene._builder.layers import (
+from edb_layout_viewer.scene._builder.assembly import scene_from_edb as _assembly_scene_from_edb
+from edb_layout_viewer.scene._builder.geometry import arc_segment_count, _thermal_relief_outline, _trace_geometry
+from edb_layout_viewer.scene._builder.layers import (
     _component_is_enabled,
     _mapped_layers,
     _padstack_layers,
     _resolve_component,
 )
-from viewer_adapter.scene._builder.padstack import _pad_template
-from viewer_adapter.scene._builder.padstacks import _padstacks as _captured_padstacks
-from viewer_adapter.scene._builder.primitives import _primitives as _captured_primitives
-from viewer_adapter.scene._builder.primitives import _scene_filters
-from viewer_adapter.scene.builder import _padstacks, _primitives, scene_from_edb
+from edb_layout_viewer.scene._builder.padstack import _pad_template
+from edb_layout_viewer.scene._builder.padstacks import _padstacks as _captured_padstacks
+from edb_layout_viewer.scene._builder.primitives import _primitives as _captured_primitives
+from edb_layout_viewer.scene._builder.primitives import _scene_filters
+from edb_layout_viewer.scene.builder import _padstacks, _primitives, scene_from_edb
 
 
 def _point(x, y):

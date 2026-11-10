@@ -7,20 +7,20 @@ from collections.abc import Callable, Iterable, Iterator
 from typing import TYPE_CHECKING, Any
 
 from ansys.edb.core.database import ProductIdType
-from layout_viewer.progress import progress_items
-from layout_viewer.scene import SceneJoin, SceneObjectInfo, ScenePad, ScenePolygon, SceneTrace
+from layout_viewer_core.progress import progress_items
+from layout_viewer_core.scene import SceneJoin, SceneObjectInfo, ScenePad, ScenePolygon, SceneTrace
 
-from viewer_adapter.diagnostics import _record_exception
-from viewer_adapter.layer_metadata import _conductor_names
-from viewer_adapter.scene._builder.geometry import _contour, _trace_geometry
-from viewer_adapter.scene._builder.layers import _cached_name, _primitive_layer_name
-from viewer_adapter.scene.filters import normalize_names
+from edb_layout_viewer.diagnostics import _record_exception
+from edb_layout_viewer.layer_metadata import _conductor_names
+from edb_layout_viewer.scene._builder.geometry import _contour, _trace_geometry
+from edb_layout_viewer.scene._builder.layers import _cached_name, _primitive_layer_name
+from edb_layout_viewer.scene.filters import normalize_names
 
 if TYPE_CHECKING:
     from ansys.edb.core.primitive.primitive import Primitive
     from pyedb.grpc.edb import Edb
 
-    from viewer_adapter.scene._builder.common import Progress
+    from edb_layout_viewer.scene._builder.common import Progress
 
     ScenePrimitives = tuple[list[ScenePolygon], list[SceneTrace], list[SceneJoin], list[ScenePad]]
 
@@ -144,7 +144,7 @@ def _primitives(
                 name = _primitive_name(primitive, primitive_type)
                 info = SceneObjectInfo(object_id, kind, net_name, name=name)
                 if kind == "trace":
-                    from viewer_adapter.conversion.geometry import trace_dimensions
+                    from edb_layout_viewer.conversion.geometry import trace_dimensions
 
                     try:
                         width, length = trace_dimensions(primitive)

@@ -7,11 +7,11 @@ from __future__ import annotations
 
 from types import SimpleNamespace
 
-from layout_viewer.scene import LayoutScene
+from layout_viewer_core.scene import LayoutScene
 
-from viewer_adapter.diagnostics import _Diagnostics
-from viewer_adapter.scene.builder import _padstacks, _primitives
-from viewer_adapter.scene.filters import normalize_names
+from edb_layout_viewer.diagnostics import _Diagnostics
+from edb_layout_viewer.scene.builder import _padstacks, _primitives
+from edb_layout_viewer.scene.filters import normalize_names
 
 
 def scene_patch_from_edb(
