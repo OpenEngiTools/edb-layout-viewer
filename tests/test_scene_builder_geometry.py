@@ -4,7 +4,7 @@ from types import SimpleNamespace
 import pytest
 
 from viewer_adapter.scene._builder.assembly import scene_from_edb as _assembly_scene_from_edb
-from viewer_adapter.scene._builder.geometry import _thermal_relief_outline, _trace_geometry
+from viewer_adapter.scene._builder.geometry import arc_segment_count, _thermal_relief_outline, _trace_geometry
 from viewer_adapter.scene._builder.layers import (
     _component_is_enabled,
     _mapped_layers,
@@ -57,6 +57,17 @@ def test_trace_geometry_preserves_arc_sweep():
 
     assert traces[0].center == (0, 0)
     assert traces[0].sweep == pytest.approx(math.pi / 2)
+
+
+def test_arc_segment_count_respects_angle_and_chord_error():
+    assert arc_segment_count(1, math.pi / 2, 0.1) == 9
+
+
+def test_arc_segment_count_rejects_non_finite_inputs_and_segment_overflow():
+    with pytest.raises(ValueError, match="must be finite"):
+        arc_segment_count(1, math.inf, 0.1)
+    with pytest.raises(ValueError, match="segment limit"):
+        arc_segment_count(1, 1000, 0.001, max_angle=math.pi, max_segments=1)
 
 
 def test_pad_template_scales_circle_dimensions_to_millimeters():
