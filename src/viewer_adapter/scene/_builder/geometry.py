@@ -14,6 +14,27 @@ if TYPE_CHECKING:
     from layout_viewer.scene import Point, Ring
 
 
+def arc_segment_count(
+    radius: float,
+    sweep: float,
+    chord_error: float,
+    max_angle: float = math.pi / 18,
+    max_segments: int = 65536,
+) -> int:
+    """Return the chord count required by radius, sweep and maximum sagitta error."""
+    if not all(math.isfinite(v) for v in (radius, sweep, chord_error, max_angle)):
+        raise ValueError("Arc tessellation inputs must be finite.")
+    if radius <= 0 or chord_error <= 0 or not 0 < max_angle <= math.pi:
+        raise ValueError("Arc radius, chord error and maximum angle must be positive.")
+    ratio = min(chord_error / radius, 2.0)
+    step = 4 * math.asin(math.sqrt(ratio / 2))
+    if step == 0:
+        raise ValueError("Arc chord error is too small for the radius.")
+    if abs(sweep) > max_segments * min(step, max_angle):
+        raise ValueError("Arc tessellation exceeds the segment limit; increase chord_error.")
+    return max(1, math.ceil(abs(sweep) / min(step, max_angle)))
+
+
 def _contour(primitive: Primitive, arc_segments: int, chord_error: float | None = None) -> Ring:
     from viewer_adapter.conversion.geometry import contour_from_points
 

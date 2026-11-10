@@ -10,9 +10,9 @@ from ansys.edb.core.definition.padstack_def_data import PadGeometryType as CoreP
 from ansys.edb.core.definition.padstack_def_data import PadType as CorePadType
 from ansys.edb.core.geometry.polygon_data import PolygonData as CorePolygonData
 from layout_viewer.scene import ScenePad, ScenePolygon
-from pyedb.misc.utilities import arc_segment_count
 
 from viewer_adapter.scene._builder.geometry import (
+    arc_segment_count,
     _nsided_polygon_points,
     _rotate,
     _rounded_outline,
