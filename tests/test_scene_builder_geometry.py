@@ -3,12 +3,12 @@ from types import SimpleNamespace
 
 import pytest
 
+from viewer_adapter.scene._builder.geometry import _thermal_relief_outline
+from viewer_adapter.scene._builder.padstack import _pad_template
 from viewer_adapter.scene.builder import (
     _component_is_enabled,
-    _pad_template,
     _resolve_component,
     _scene_filters,
-    _thermal_relief_outline,
     _trace_geometry,
 )
 
