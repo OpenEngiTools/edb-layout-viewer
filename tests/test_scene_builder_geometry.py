@@ -3,7 +3,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from viewer_adapter.scene._builder.geometry import _thermal_relief_outline
+from viewer_adapter.scene._builder.assembly import scene_from_edb as _assembly_scene_from_edb
+from viewer_adapter.scene._builder.geometry import _thermal_relief_outline, _trace_geometry
 from viewer_adapter.scene._builder.layers import (
     _component_is_enabled,
     _mapped_layers,
@@ -11,10 +12,10 @@ from viewer_adapter.scene._builder.layers import (
     _resolve_component,
 )
 from viewer_adapter.scene._builder.padstack import _pad_template
-from viewer_adapter.scene.builder import (
-    _scene_filters,
-    _trace_geometry,
-)
+from viewer_adapter.scene._builder.padstacks import _padstacks as _captured_padstacks
+from viewer_adapter.scene._builder.primitives import _primitives as _captured_primitives
+from viewer_adapter.scene._builder.primitives import _scene_filters
+from viewer_adapter.scene.builder import _padstacks, _primitives, scene_from_edb
 
 
 def _point(x, y):
@@ -119,3 +120,9 @@ def test_padstack_layer_mapping_and_span_resolution():
         "inner",
         "bottom",
     ]
+
+
+def test_builder_module_preserves_scene_and_patching_entry_points():
+    assert scene_from_edb is _assembly_scene_from_edb
+    assert _padstacks is _captured_padstacks
+    assert _primitives is _captured_primitives
