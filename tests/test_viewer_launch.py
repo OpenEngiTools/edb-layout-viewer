@@ -63,7 +63,46 @@ def test_launch_viewer_configures_live_capture_and_delta_loader(monkeypatch):
     assert captured["delta_capture"][:3] == (edb, delta, previous)
 
 
-@pytest.mark.parametrize("kwargs", [{"live": True, "scene": object()}, {"edb": None, "scene": None}])
+@pytest.mark.parametrize("fails", [False, True])
+def test_launch_viewer_calls_after_capture_when_capture_finishes(monkeypatch, fails):
+    show_options = {}
+    events = []
+
+    def fake_scene_from_edb(edb, **kwargs):
+        events.append("capture")
+        if fails:
+            raise RuntimeError("capture failed")
+        return "scene"
+
+    monkeypatch.setitem(
+        sys.modules, "edb_layout_viewer.scene.builder", SimpleNamespace(scene_from_edb=fake_scene_from_edb)
+    )
+    monkeypatch.setitem(
+        sys.modules,
+        "layout_viewer_core.qt.app",
+        SimpleNamespace(show_scene=lambda scene, **kw: show_options.update(kw)),
+    )
+
+    launch.launch_viewer(SimpleNamespace(edbpath="board.aedb"), after_capture=lambda: events.append("closed"))
+
+    assert events == []
+    if fails:
+        with pytest.raises(RuntimeError):
+            show_options["loader"](None)
+    else:
+        assert show_options["loader"](None) == "scene"
+    assert events == ["capture", "closed"]
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"live": True, "scene": object()},
+        {"edb": None, "scene": None},
+        {"edb": object(), "live": True, "after_capture": lambda: None},
+        {"scene": object(), "after_capture": lambda: None},
+    ],
+)
 def test_launch_viewer_rejects_invalid_source_options(kwargs):
     with pytest.raises(ValueError):
         launch.launch_viewer(**kwargs)
