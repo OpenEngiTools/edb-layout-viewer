@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import argparse
+import threading
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
@@ -106,13 +107,25 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.error(f"design directory not found: {args.design}")
 
     edb = _open_edb(args.design, args.edbversion)
-    launch_viewer(
-        edb,
-        layers=args.layers,
-        nets=args.nets,
-        backend=args.backend,
-        live=args.live,
-        debug=args.debug,
-        block=True,
-    )
+    closed = threading.Lock()
+
+    def close_edb() -> None:
+        # Runs on the capture thread and again on exit; close only once.
+        if closed.acquire(blocking=False):
+            edb.close()
+
+    try:
+        launch_viewer(
+            edb,
+            layers=args.layers,
+            nets=args.nets,
+            backend=args.backend,
+            live=args.live,
+            debug=args.debug,
+            block=True,
+            # Live updates keep reading the session, so close it only on exit.
+            after_capture=None if args.live else close_edb,
+        )
+    finally:
+        close_edb()
     return 0

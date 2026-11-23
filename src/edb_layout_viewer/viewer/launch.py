@@ -5,12 +5,15 @@
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from layout_viewer_core.qt.window import LayoutWindow
     from layout_viewer_core.scene import LayoutScene
+
+_logger = logging.getLogger(__name__)
 
 
 def launch_viewer(
@@ -34,6 +37,7 @@ def launch_viewer(
     refresh_interval: int = 50,
     debug: bool = False,
     backend: str | None = None,
+    after_capture: Callable[[], None] | None = None,
 ) -> LayoutWindow:
     """Open an interactive Qt RHI layout window.
 
@@ -92,6 +96,10 @@ def launch_viewer(
         Rendering API: "auto", "vulkan", "d3d11", or "metal". Defaults to
         PYEDB_VIEWER_BACKEND or "auto": Direct3D 11 on Windows, Vulkan on
         Linux, Metal on macOS. OpenGL is not supported.
+    after_capture : callable, optional
+        Called once on the source-reading thread when the EDB capture finishes,
+        whether it succeeded or failed, for example to close the session. Not
+        supported with ``live=True``, which keeps reading the session.
 
     Returns
     -------
@@ -103,6 +111,8 @@ def launch_viewer(
         raise ValueError("Provide exactly one of edb or scene.")
     if live and edb is None:
         raise ValueError("live=True requires an EDB session.")
+    if after_capture is not None and (live or edb is None):
+        raise ValueError("after_capture requires an EDB session and live=False.")
     if isinstance(refresh_interval, bool) or not isinstance(refresh_interval, int) or refresh_interval < 0:
         raise ValueError("refresh_interval must be a nonnegative integer in milliseconds.")
     from layout_viewer_core.qt.app import show_scene
@@ -118,18 +128,26 @@ def launch_viewer(
         ) -> LayoutScene:
             from edb_layout_viewer.scene.builder import scene_from_edb
 
-            return scene_from_edb(
-                edb,
-                layers=layers,
-                nets=nets,
-                arc_segments=arc_segments,
-                progress=progress,
-                analytic_traces=analytic_traces,
-                exact_component_bounds=exact_component_bounds,
-                chord_error=chord_error,
-                preview=preview,
-                debug=debug,
-            )
+            try:
+                return scene_from_edb(
+                    edb,
+                    layers=layers,
+                    nets=nets,
+                    arc_segments=arc_segments,
+                    progress=progress,
+                    analytic_traces=analytic_traces,
+                    exact_component_bounds=exact_component_bounds,
+                    chord_error=chord_error,
+                    preview=preview,
+                    debug=debug,
+                )
+            finally:
+                if after_capture is not None:
+                    try:
+                        after_capture()
+                    except Exception:
+                        # The captured scene stays valid; do not discard it.
+                        _logger.exception("after_capture callback failed")
 
         def load_delta(delta, previous, progress):
             from edb_layout_viewer.scene.patching import scene_patch_from_edb

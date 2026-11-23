@@ -32,19 +32,20 @@ def test_main_opens_design_and_blocks_in_viewer(tmp_path, monkeypatch):
 
     def fake_open(path, edbversion):
         opened["args"] = (path, edbversion)
-        return "EDB"
+        return edb
 
     def fake_launch(edb, **kwargs):
         launched["edb"] = edb
         launched.update(kwargs)
 
+    edb = Mock()
     monkeypatch.setattr(cli, "_open_edb", fake_open)
     monkeypatch.setattr(cli, "launch_viewer", fake_launch)
     monkeypatch.setattr(cli, "_select_edb_file", Mock(side_effect=AssertionError("unexpected file dialog")))
 
     assert cli.main([str(design), "--edbversion", "2025.1", "--layers", "TOP"]) == 0
     assert opened["args"] == (design, "2025.1")
-    assert launched["edb"] == "EDB"
+    assert launched["edb"] is edb
     assert launched["layers"] == ["TOP"]
     assert launched["nets"] is None
     assert launched["block"] is True
@@ -55,7 +56,7 @@ def test_main_passes_live_flag_values(tmp_path, monkeypatch):
     design = tmp_path / "board.aedb"
     design.mkdir()
     launched = {}
-    monkeypatch.setattr(cli, "_open_edb", lambda path, edbversion: "EDB")
+    monkeypatch.setattr(cli, "_open_edb", lambda path, edbversion: Mock())
     monkeypatch.setattr(cli, "launch_viewer", lambda edb, **kwargs: launched.update(kwargs))
 
     assert cli.main([str(design), "--live", "False"]) == 0
@@ -91,7 +92,8 @@ def test_main_opens_selected_edb_file(tmp_path, monkeypatch):
     design.mkdir()
     selected = design / "edb.def"
     selected.touch()
-    open_edb = Mock(return_value="EDB")
+    edb = Mock()
+    open_edb = Mock(return_value=edb)
     launch = Mock()
     monkeypatch.setattr(cli, "_select_edb_file", lambda: selected)
     monkeypatch.setattr(cli, "_open_edb", open_edb)
@@ -100,7 +102,51 @@ def test_main_opens_selected_edb_file(tmp_path, monkeypatch):
     assert cli.main(["--edbversion", "2025.1", "--layers", "TOP", "--live", "false"]) == 0
 
     open_edb.assert_called_once_with(design, "2025.1")
-    launch.assert_called_once_with("EDB", layers=["TOP"], nets=None, backend=None, live=False, debug=False, block=True)
+    launch.assert_called_once()
+    args, kwargs = launch.call_args
+    assert args == (edb,)
+    assert kwargs.pop("after_capture") is not None
+    assert kwargs == {"layers": ["TOP"], "nets": None, "backend": None, "live": False, "debug": False, "block": True}
+
+
+def test_main_closes_edb_once_after_capture(tmp_path, monkeypatch):
+    design = tmp_path / "board.aedb"
+    design.mkdir()
+    edb = Mock()
+
+    def fake_launch(edb, *, after_capture, **kwargs):
+        edb.close.assert_not_called()
+        after_capture()
+        edb.close.assert_called_once_with()
+
+    monkeypatch.setattr(cli, "_open_edb", lambda path, edbversion: edb)
+    monkeypatch.setattr(cli, "launch_viewer", fake_launch)
+
+    assert cli.main([str(design)]) == 0
+    edb.close.assert_called_once_with()
+
+
+@pytest.mark.parametrize("fails", [False, True])
+def test_main_live_keeps_edb_open_until_viewer_exits(tmp_path, monkeypatch, fails):
+    design = tmp_path / "board.aedb"
+    design.mkdir()
+    edb = Mock()
+
+    def fake_launch(edb, *, after_capture, **kwargs):
+        assert after_capture is None
+        edb.close.assert_not_called()
+        if fails:
+            raise RuntimeError("viewer failed")
+
+    monkeypatch.setattr(cli, "_open_edb", lambda path, edbversion: edb)
+    monkeypatch.setattr(cli, "launch_viewer", fake_launch)
+
+    if fails:
+        with pytest.raises(RuntimeError):
+            cli.main([str(design), "--live"])
+    else:
+        assert cli.main([str(design), "--live"]) == 0
+    edb.close.assert_called_once_with()
 
 
 def test_main_exits_when_file_dialog_is_cancelled(monkeypatch):

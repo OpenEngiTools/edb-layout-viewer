@@ -51,6 +51,37 @@ launch_viewer(edb, block=True)
 The `Edb` session remains under your script's control while the viewer is
 open.
 
+Pass `block=False` to keep working with the session while the window stays
+open, for example in IPython or Jupyter with Qt event-loop integration
+(`%gui qt`) or inside an existing Qt application:
+
+```python
+window = launch_viewer(edb, block=False)  # returns once the initial capture finishes
+
+# ... edit the design with PyEDB ...
+window.refresh()  # redraw from the current EDB state
+```
+
+Keep a reference to the returned window so it is not garbage-collected. The
+window only stays responsive, and `live=True` updates only apply, while a Qt
+event loop is running. If a Qt event loop is already running, `block=False` is
+required.
+
+## Windows executable
+
+Build a windowed, one-folder executable with PyInstaller:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File packaging\build_exe.ps1
+```
+
+The output is `dist\edb-layout-viewer\edb-layout-viewer.exe`; distribute the
+whole `dist\edb-layout-viewer` folder. Run it without arguments to pick an
+`edb.def` file, or pass the same arguments as the CLI. The target machine still
+needs an Ansys Electronics Desktop installation for the EDB runtime. Output and
+errors are written to `edb-layout-viewer.log` next to the executable, and
+errors are also shown in a dialog.
+
 ## More information
 
 - [Contributing](CONTRIBUTING.md)
