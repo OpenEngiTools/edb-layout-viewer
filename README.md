@@ -51,6 +51,22 @@ launch_viewer(edb, block=True)
 The `Edb` session remains under your script's control while the viewer is
 open.
 
+Pass `block=False` to keep working with the session while the window stays
+open, for example in IPython or Jupyter with Qt event-loop integration
+(`%gui qt`) or inside an existing Qt application:
+
+```python
+window = launch_viewer(edb, block=False)  # returns once the initial capture finishes
+
+# ... edit the design with PyEDB ...
+window.refresh()  # redraw from the current EDB state
+```
+
+Keep a reference to the returned window so it is not garbage-collected. The
+window only stays responsive, and `live=True` updates only apply, while a Qt
+event loop is running. If a Qt event loop is already running, `block=False` is
+required.
+
 ## Windows executable
 
 Build a windowed, one-folder executable with PyInstaller:
