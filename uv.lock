@@ -245,7 +245,7 @@ requires-dist = [
     { name = "ansys-edb-core", specifier = ">=0.3.3,<0.4" },
     { name = "build", marker = "extra == 'dev'", specifier = ">=1.2" },
     { name = "layout-viewer-core", editable = "../layout_viewer_core" },
-    { name = "pyedb", specifier = ">=0.87.0,<0.88" },
+    { name = "pyedb", specifier = ">=0.87.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=8.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.11" },
