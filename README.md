@@ -51,6 +51,21 @@ launch_viewer(edb, block=True)
 The `Edb` session remains under your script's control while the viewer is
 open.
 
+## Windows executable
+
+Build a windowed, one-folder executable with PyInstaller:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File packaging\build_exe.ps1
+```
+
+The output is `dist\edb-layout-viewer\edb-layout-viewer.exe`; distribute the
+whole `dist\edb-layout-viewer` folder. Run it without arguments to pick an
+`edb.def` file, or pass the same arguments as the CLI. The target machine still
+needs an Ansys Electronics Desktop installation for the EDB runtime. Output and
+errors are written to `edb-layout-viewer.log` next to the executable, and
+errors are also shown in a dialog.
+
 ## More information
 
 - [Contributing](CONTRIBUTING.md)
